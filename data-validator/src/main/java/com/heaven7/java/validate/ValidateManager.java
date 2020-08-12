@@ -14,6 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * validate manager
+ * @author heaven7
+ */
 public final class ValidateManager {
 
     private final Map<Class<?>, Validator> mCache = new HashMap<>();
@@ -36,11 +40,21 @@ public final class ValidateManager {
         return mContext;
     }
 
+    /**
+     * validate the object until failed and return the failed item.
+     * @param obj the object to validate
+     * @return the item which is validate failed.
+     */
     public Item validate(Object obj){
         List<Item> list = new ArrayList<>();
         getValidateItems(obj, obj.getClass(), list, true);
         return list.isEmpty() ? null : list.get(0);
     }
+    /**
+     * validate the object with all failed items
+     * @param obj the object to validate
+     * @return the items which are all validate failed.
+     */
     public List<Item> validateAll(Object obj){
         List<Item> list = new ArrayList<>();
         getValidateItems(obj, obj.getClass(), list, false);
