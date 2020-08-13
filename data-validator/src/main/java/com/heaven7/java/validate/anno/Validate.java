@@ -1,13 +1,22 @@
 package com.heaven7.java.validate.anno;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.heaven7.java.validate.Validator;
 
+import java.lang.annotation.*;
+
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Validate{
+    /**
+     * the notice message if validate failed
+     * @return the msg
+     */
     String value();
-    Class<?> validator() default Void.class;
+
+    /**
+     * the validator class to validate
+     * @return the validator class. or default validator class.
+     */
+    Class<? extends Validator> validator() default Validator.class;
 }

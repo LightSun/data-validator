@@ -1,8 +1,10 @@
 package com.heaven7.java.validate;
 
 import com.heaven7.java.validate.anno.Validate;
-import com.heaven7.java.validate.impl.StringValidator;
+import com.heaven7.java.validate.anno.ValidateDate;
+import com.heaven7.java.validate.validator.StringValidator;
 import com.heaven7.java.validate.plugin.CommonValidatePlugin;
+import com.heaven7.java.validate.plugin.DateValidatePlugin;
 import com.heaven7.java.visitor.MapPredicateVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -21,21 +23,55 @@ import java.util.Map;
 public final class ValidateManager {
 
     private final Map<Class<?>, Validator> mCache = new HashMap<>();
+    //anno-plugin
     private final Map<Class, ValidatePlugin> mPlugins = new HashMap<>();
     private final Object mContext;
+    private ValueReader mReader = ValueReader.DEFAULT;
 
+    /**
+     * create validate manager from context
+     * @param context the context
+     */
     public ValidateManager(Object context) {
         this.mContext = context;
     }
+    /**
+     * create builder from context
+     * @param context the context
+     * @return the builder.
+     */
+    public static Builder newBuilder(Object context){
+        return new Builder(context);
+    }
+    /**
+     * set value reader
+     * @param mReader the value reader
+     */
+    public void setValueReader(ValueReader mReader) {
+        this.mReader = mReader;
+    }
 
+    /**
+     * register the plugin
+     * @param clazz the annotation class
+     * @param plugin the plugin
+     */
     public void registerPlugin(Class<? extends Annotation> clazz, ValidatePlugin plugin){
         mPlugins.put(clazz, plugin);
     }
 
+    /**
+     * unregister the plugin
+     * @param clazz the annotation class
+     */
     public void unregisterPlugin(Class<? extends Annotation> clazz){
         mPlugins.remove(clazz);
     }
 
+    /**
+     * get the context
+     * @return the context.
+     */
     public Object getContext() {
         return mContext;
     }
@@ -101,7 +137,7 @@ public final class ValidateManager {
             ValidatePlugin plugin = resolveAnnotation(cur, arr);
             if(plugin != null){
                 Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
-                if(!validator.accept(mContext, owner)){
+                if(!validator.accept(mContext, owner, arr[0])){
                     out.add(new Item(plugin.getMessage(arr[0]), validator, owner));
                 }
                 break;
@@ -114,21 +150,21 @@ public final class ValidateManager {
                     if(plugin != null){
                         Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
                         try {
-                            Object o = f.get(owner);
-                            if(!validator.accept(mContext, o)){
+                            Object o = mReader.read(mContext, owner, f);
+                            if(!validator.accept(mContext, o, arr[0])){
                                 out.add(new Item(plugin.getMessage(arr[0]), validator, o));
                                 if(breakIfFound){
                                     break out;
                                 }
                             }
-                        } catch (IllegalAccessException e) {
+                        } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
                     }
                 }
             }
             cur = cur.getSuperclass();
-            if(cur == null || cur == Object.class){
+            if(cur == null || cur.getName().startsWith("android.") || cur.getName().startsWith("java.") || cur == Object.class){
                 break;
             }
         }
@@ -138,14 +174,14 @@ public final class ValidateManager {
         if(validator != null){
             return validator;
         }
-        if(Validator.class.isAssignableFrom(type)){
+        if(type == Validator.class){
+            validator = new StringValidator();
+        }else {
             try {
                 validator = (Validator) type.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }else {
-            validator = new StringValidator();
         }
         mCache.put(type, validator);
         return validator;
@@ -154,15 +190,20 @@ public final class ValidateManager {
     public static class Builder{
         private final ValidateManager vm;
 
-        private Builder(ValidateManager vm) {
-            this.vm = vm;
+        private Builder(Object context) {
+            this.vm = new ValidateManager(context);
         }
         public Builder plugin(Class<? extends Annotation> clazz, ValidatePlugin plugin){
             vm.registerPlugin(clazz, plugin);
             return this;
         }
-        public Builder withDefault(){
+        public Builder withDefaultPlugins(){
             vm.registerPlugin(Validate.class, new CommonValidatePlugin());
+            vm.registerPlugin(ValidateDate.class, new DateValidatePlugin());
+            return this;
+        }
+        public Builder valueReader(ValueReader reader){
+            vm.setValueReader(reader);
             return this;
         }
         public ValidateManager build(){
