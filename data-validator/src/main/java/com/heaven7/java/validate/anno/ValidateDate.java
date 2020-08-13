@@ -1,6 +1,7 @@
 package com.heaven7.java.validate.anno;
 
 import com.heaven7.java.validate.RangeValidator;
+import com.heaven7.java.validate.validator.NumberRangeValidator;
 
 import java.lang.annotation.*;
 
@@ -25,5 +26,5 @@ public @interface ValidateDate {
      * the range validator class
      * @return  the range validator class
      */
-    Class<? extends RangeValidator> rangeValidator() default RangeValidator.class;
+    Class<? extends RangeValidator> rangeValidator() default NumberRangeValidator.class;
 }
