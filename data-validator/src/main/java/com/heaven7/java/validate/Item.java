@@ -1,7 +1,6 @@
 package com.heaven7.java.validate;
 
 public final class Item {
-
     /**
      * the notice message
      */
@@ -15,9 +14,15 @@ public final class Item {
      */
     public final Object value;
 
-    public Item(String msg, Validator validator, Object val) {
+    /**
+     * the sort order. 'AESC'
+     */
+    public final int order;
+
+    public Item(String msg, Validator validator, Object val, int order) {
         this.msg = msg;
         this.validator = validator;
         this.value = val;
+        this.order = order;
     }
 }

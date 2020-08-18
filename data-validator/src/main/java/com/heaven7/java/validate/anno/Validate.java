@@ -19,4 +19,10 @@ public @interface Validate{
      * @return the validator class. or default validator class.
      */
     Class<? extends Validator> validator() default Validator.class;
+
+    /**
+     * the order of member. min means validate first.
+     * @return the order
+     */
+    int order() default 1;
 }

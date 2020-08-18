@@ -6,14 +6,14 @@ import com.heaven7.java.validate.DateContext;
 import com.heaven7.java.validate.RangeValidator;
 import com.heaven7.java.validate.Validator;
 import com.heaven7.java.validate.anno.ValidateDate;
-import com.heaven7.java.validate.parser.NumberParser;
+import com.heaven7.java.validate.parser.NumberDateParser;
 
 import java.lang.annotation.Annotation;
 import java.text.SimpleDateFormat;
 
 public class DateValidator implements Validator {
 
-    private final NumberParser parser = new NumberParser();
+    private final NumberDateParser parser = new NumberDateParser();
 
     @Override
     public boolean accept(Object context, Object input, Annotation annotation) {

@@ -2,84 +2,113 @@ package com.heaven7.java.validate.validator;
 
 import com.heaven7.java.validate.RangeValidator;
 
-import java.util.Comparator;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //a </<=/>/>= x </<=/>/>= b
 public class SimpleRangeValidator implements RangeValidator {
 
-    private static final char CH_LESS = '<';
-    private static final char CH_LARGER = '>';
-    private static final char CH_EQ = '=';
+    private static final Pattern PAT = Pattern.compile("([<[>]])=?");
+    private static final Map<String, Operator> sOperators = new HashMap<>(6);
+
+    static {
+        sOperators.put("<", new LessOperator());
+        sOperators.put("<=", new LessThanOperator());
+        sOperators.put(">", new GreaterOperator());
+        sOperators.put(">=", new GreaterThanOperator());
+    }
+
+    private static List<Item> findSymbols(String in){
+        List<Item> items = new ArrayList<>();
+        Matcher matcher = PAT.matcher(in);
+        while (matcher.find()){
+            items.add(new Item(matcher.group(), matcher.start(), matcher.end()));
+        }
+        Item last = null;
+        Item cur, next;
+        String left, right;
+        for (int i = 0, size = items.size() ; i < size; i ++){
+            cur = items.get(i);
+            next =  i != size - 1 ? items.get(i + 1) : null;
+            left = in.substring(last != null ? last.end + 1 : 0, cur.start).trim();
+            right = in.substring(cur.end + 1, next != null ? next.start : in.length()).trim();
+
+            cur.leftExpre = left;
+            cur.rightExpre = right;
+            //System.out.println(cur.symbol + " : "  + String.format("left = %s ,right = %s", left, right));
+            last = cur;
+        }
+        return items;
+    }
 
     @Override
-    public boolean accept(Object context, String expre, Object val, Parser parser, Comparator com) {
-        int i = expre.indexOf('x');
-        final String s1 = expre.substring(0, i).trim();
-        final String s2 = expre.substring(i + 1).trim();
-        final boolean s1_has_eq = s1.charAt(s1.length() -1) == CH_EQ;
-        final boolean s2_has_eq = s2.charAt(1) == CH_EQ;
-
-        final String str_left = s1_has_eq ? s1.substring(0, s1.length() - 2).trim() : s1.substring(0, s1.length() - 1).trim();
-        final String str_right = s2_has_eq ? s2.substring(2).trim() : s2.substring(1).trim();
-
-        final char ch1 = s1.charAt(s1_has_eq ? s1.length() - 2 : s1.length() - 1);
-        final char ch2 = s2.charAt(0);
-        final boolean lef_less = ch1 == CH_LESS;
-        final boolean lef_larger = ch1 == CH_LARGER;
-        final boolean right_less = ch2 == CH_LESS;
-        final boolean right_larger = ch2 == CH_LARGER;
-
-        Object left, right;
-        try {
-            left =  parser.parse(context, str_left);
-            right = parser.parse(context, str_right);
-        }catch (Exception e){
+    public boolean accept(Object context, String expre, Object val, Parser parser, Comparator com) throws Exception{
+        List<Item> items = findSymbols(expre);
+        if(items.size() == 0){
             return false;
         }
-        // 1 < x or 1 <= x
-        if(lef_less) {
-            if (s1_has_eq) {
-                if (com.compare(val, left) < 0) {
-                    return false;
-                }
-            } else {
-                if (com.compare(val, left) <= 0) {
-                    return false;
-                }
+        //a < x <= c
+        //a < b > c <= d >= e
+        for (Item item: items){
+            Object left = item.leftExpre.equals("x") ? val : parser.parse(context, item.leftExpre);
+            if(left == null){
+                throw new IllegalStateException("can't parse expre = " + item.leftExpre + " ,parser = " + parser.getClass().getName());
             }
-        }else if(lef_larger){
-            if (s1_has_eq) {
-                if (com.compare(val, left) > 0) {
-                    return false;
-                }
-            } else {
-                if (com.compare(val, left) >= 0) {
-                    return false;
-                }
+            Object right = item.rightExpre.equals("x") ? val : parser.parse(context, item.rightExpre);
+            if(right == null){
+                throw new IllegalStateException("can't parse expre = " + item.rightExpre + " ,parser = " + parser.getClass().getName());
             }
-        }
-        // x < 2 or x <= 2
-        if(right_less){
-            if(s2_has_eq){
-                if(com.compare(val, right) > 0){
-                    return false;
-                }
-            }else {
-                if(com.compare(val, right) >= 0){
-                    return false;
-                }
+            Operator operator = sOperators.get(item.symbol);
+            if(operator == null){
+                throw new IllegalStateException("can't find operator = " + item.symbol);
             }
-        }else if(right_larger){
-            if(s2_has_eq){
-                if(com.compare(val, right) < 0){
-                    return false;
-                }
-            }else {
-                if(com.compare(val, right) <= 0){
-                    return false;
-                }
+            if(!operator.compare(com, left, right)){
+                return false;
             }
         }
         return true;
+    }
+    private static class Item{
+        final String symbol;
+        final int start;
+        final int end;
+
+        String leftExpre;
+        String rightExpre;
+
+        public Item(String symbol, int start, int end) {
+            this.symbol = symbol;
+            this.start = start;
+            this.end = end;
+        }
+    }
+
+    private interface Operator{
+        boolean compare(Comparator com, Object v1, Object v2);
+    }
+    private static class LessOperator implements Operator{
+        @Override
+        public boolean compare(Comparator com, Object v1, Object v2) {
+            return com.compare(v1, v2) < 0;
+        }
+    }
+    private static class LessThanOperator implements Operator{
+        @Override
+        public boolean compare(Comparator com, Object v1, Object v2) {
+            return com.compare(v1, v2) <= 0;
+        }
+    }
+    private static class GreaterOperator implements Operator{
+        @Override
+        public boolean compare(Comparator com, Object v1, Object v2) {
+            return com.compare(v1, v2) > 0;
+        }
+    }
+    private static class GreaterThanOperator implements Operator{
+        @Override
+        public boolean compare(Comparator com, Object v1, Object v2) {
+            return com.compare(v1, v2) >= 0;
+        }
     }
 }

@@ -11,16 +11,20 @@ import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * validate manager
  * @author heaven7
  */
 public final class ValidateManager {
+
+    private static final Comparator<Item> COM_ORDER = new Comparator<Item>() {
+        @Override
+        public int compare(Item o1, Item o2) {
+            return Integer.compare(o1.order, o2.order);
+        }
+    };
 
     private final Map<Class<?>, Validator> mCache = new HashMap<>();
     //anno-plugin
@@ -87,6 +91,24 @@ public final class ValidateManager {
         return list.isEmpty() ? null : list.get(0);
     }
     /**
+     * validate the object with sort.
+     * @param obj the object to validate
+     * @return the item which is validate failed.
+     */
+    public Item validateWithSort(Object obj){
+        List<Item> list = new ArrayList<>();
+        getValidateItems(obj, obj.getClass(), list, false);
+        switch (list.size()){
+            case 0:
+                return null;
+            case 1:
+                return list.get(0);
+            default:
+                Collections.sort(list, COM_ORDER);
+                return list.get(0);
+        }
+    }
+    /**
      * validate the object with all failed items
      * @param obj the object to validate
      * @return the items which are all validate failed.
@@ -94,6 +116,20 @@ public final class ValidateManager {
     public List<Item> validateAll(Object obj){
         List<Item> list = new ArrayList<>();
         getValidateItems(obj, obj.getClass(), list, false);
+        return list;
+    }
+
+    /**
+     * validate the object with all failed sorted items.
+     * @param obj the object to validate
+     * @return the items which are all validate failed.
+     */
+    public List<Item> validateAllWithSort(Object obj){
+        List<Item> list = new ArrayList<>();
+        getValidateItems(obj, obj.getClass(), list, false);
+        if(list.size() > 1){
+            Collections.sort(list, COM_ORDER);
+        }
         return list;
     }
 
@@ -138,27 +174,30 @@ public final class ValidateManager {
             if(plugin != null){
                 Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
                 if(!validator.accept(mContext, owner, arr[0])){
-                    out.add(new Item(plugin.getMessage(arr[0]), validator, owner));
+                    out.add(new Item(plugin.getMessage(arr[0]), validator, owner, plugin.getOder(arr[0])));
                 }
-                break;
-            }
-            Field[] fields = cur.getDeclaredFields();
-            if(fields != null){
-                for (Field f : fields){
-                    f.setAccessible(true);
-                    plugin = resolveAnnotation(f, arr);
-                    if(plugin != null){
-                        Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
-                        try {
-                            Object o = mReader.read(mContext, owner, f);
-                            if(!validator.accept(mContext, o, arr[0])){
-                                out.add(new Item(plugin.getMessage(arr[0]), validator, o));
-                                if(breakIfFound){
-                                    break out;
+                if(breakIfFound){
+                    break;
+                }
+            }else {
+                Field[] fields = cur.getDeclaredFields();
+                if(fields != null){
+                    for (Field f : fields){
+                        f.setAccessible(true);
+                        plugin = resolveAnnotation(f, arr);
+                        if(plugin != null){
+                            Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
+                            try {
+                                Object o = mReader.read(mContext, owner, f);
+                                if(!validator.accept(mContext, o, arr[0])){
+                                    out.add(new Item(plugin.getMessage(arr[0]), validator, o, plugin.getOder(arr[0])));
+                                    if(breakIfFound){
+                                        break out;
+                                    }
                                 }
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
                         }
                     }
                 }

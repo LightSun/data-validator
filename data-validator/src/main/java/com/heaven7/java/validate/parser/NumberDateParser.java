@@ -5,7 +5,10 @@ import com.heaven7.java.validate.RangeValidator;
 
 import java.text.SimpleDateFormat;
 
-public class NumberParser implements RangeValidator.Parser {
+/**
+ * the parser which can par
+ */
+public class NumberDateParser implements RangeValidator.Parser {
 
     private static final char DOT = '.';
     @Override
@@ -18,13 +21,12 @@ public class NumberParser implements RangeValidator.Parser {
         }else if(context instanceof DateContext){
             return new SimpleDateFormat(((DateContext) context).getDateTemplate()).parse(str).getTime();
         }
-        return false;
+        return null;
     }
-
 
     private static boolean isDigit(String str){
         for (char ch : str.toCharArray()){
-            if(!Character.isDigit(ch) && ch != DOT){
+            if(ch != DOT && !Character.isDigit(ch)){
                 return false;
             }
         }

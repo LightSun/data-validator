@@ -21,7 +21,7 @@ public interface RangeValidator {
          * parse the expression to object
          * @param context the context
          * @param str the expre
-         * @return the object
+         * @return the parsed object or null if known expression.
          * @throws Exception if occurs
          */
         Object parse(Object context, String str) throws Exception;

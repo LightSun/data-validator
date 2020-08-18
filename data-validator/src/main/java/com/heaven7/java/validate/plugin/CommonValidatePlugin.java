@@ -17,4 +17,10 @@ public class CommonValidatePlugin implements ValidatePlugin {
         Validate validate = (Validate) anno;
         return validate.validator();
     }
+
+    @Override
+    public int getOder(Annotation anno) {
+        Validate validate = (Validate) anno;
+        return validate.order();
+    }
 }
