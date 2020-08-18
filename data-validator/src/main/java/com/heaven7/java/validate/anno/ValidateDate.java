@@ -17,7 +17,7 @@ public @interface ValidateDate {
     String value();
 
     /**
-     * the range expression . like '{} <= x <= {} '
+     * the range expression . like '199 <= x <= 2000 '
      * @return the range expression
      */
     String rangeExpre() default "";
@@ -27,4 +27,10 @@ public @interface ValidateDate {
      * @return  the range validator class
      */
     Class<? extends RangeValidator> rangeValidator() default SimpleRangeValidator.class;
+
+    /**
+     * the order of member. min means validate first, that means 'AESC'.
+     * @return the order
+     */
+    int order() default 1;
 }

@@ -6,5 +6,5 @@ public interface ValidatePlugin {
 
     String getMessage(Annotation anno);
     Class<?> getValidatorClass(Annotation anno);
-    int getOder(Annotation anno);
+    int getOrder(Annotation anno);
 }

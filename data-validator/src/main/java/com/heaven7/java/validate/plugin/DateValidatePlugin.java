@@ -17,4 +17,10 @@ public class DateValidatePlugin implements ValidatePlugin {
     public Class<?> getValidatorClass(Annotation anno) {
         return DateValidator.class;
     }
+
+    @Override
+    public int getOrder(Annotation anno) {
+        ValidateDate vd = (ValidateDate) anno;
+        return vd.order();
+    }
 }

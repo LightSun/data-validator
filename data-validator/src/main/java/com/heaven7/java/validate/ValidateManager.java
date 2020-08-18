@@ -174,7 +174,7 @@ public final class ValidateManager {
             if(plugin != null){
                 Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
                 if(!validator.accept(mContext, owner, arr[0])){
-                    out.add(new Item(plugin.getMessage(arr[0]), validator, owner, plugin.getOder(arr[0])));
+                    out.add(new Item(plugin.getMessage(arr[0]), validator, owner, plugin.getOrder(arr[0])));
                 }
                 if(breakIfFound){
                     break;
@@ -190,7 +190,7 @@ public final class ValidateManager {
                             try {
                                 Object o = mReader.read(mContext, owner, f);
                                 if(!validator.accept(mContext, o, arr[0])){
-                                    out.add(new Item(plugin.getMessage(arr[0]), validator, o, plugin.getOder(arr[0])));
+                                    out.add(new Item(plugin.getMessage(arr[0]), validator, o, plugin.getOrder(arr[0])));
                                     if(breakIfFound){
                                         break out;
                                     }
