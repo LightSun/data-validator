@@ -1,6 +1,7 @@
 package com.heaven7.java.validate.validator;
 
 import com.heaven7.java.base.util.TextUtils;
+import com.heaven7.java.validate.Comparators;
 import com.heaven7.java.validate.DateContext;
 import com.heaven7.java.validate.RangeValidator;
 import com.heaven7.java.validate.Validator;
@@ -24,7 +25,7 @@ public class DateValidator implements Validator {
                     if(input instanceof String && context instanceof DateContext){
                         val = new SimpleDateFormat(((DateContext) context).getDateTemplate()).parse((String) input).getTime();
                     }
-                    return vd.rangeValidator().newInstance().accept(context, vd.rangeExpre(), val, parser);
+                    return vd.rangeValidator().newInstance().accept(context, vd.rangeExpre(), val, parser, Comparators.NUMBER);
                 }
             }
             if(input instanceof String && context instanceof DateContext){

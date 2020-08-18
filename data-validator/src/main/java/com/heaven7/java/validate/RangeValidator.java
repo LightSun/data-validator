@@ -1,6 +1,8 @@
 package com.heaven7.java.validate;
 
 
+import java.util.Comparator;
+
 public interface RangeValidator {
 
     /**
@@ -9,9 +11,10 @@ public interface RangeValidator {
      * @param expre the expression
      * @param val the value
      * @param parser the parser to parse left and right expression
+     * @param com the comparator
      * @return true if validate success . false otherwise.
      */
-    boolean accept(Object context, String expre, Object val, Parser parser);
+    boolean accept(Object context, String expre, Object val, Parser parser, Comparator com) throws Exception;
 
     interface Parser{
         /**
