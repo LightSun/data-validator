@@ -35,7 +35,8 @@ public interface ValueReader {
         public Object read(Object context,Object owner, Field f) throws Exception{
             owner = f.get(owner);
             Method m = owner.getClass().getMethod("getText");
-            return m.invoke(owner).toString();
+            Object result = m.invoke(owner);
+            return result != null ? result.toString() : null;
         }
     };
 }
