@@ -26,7 +26,7 @@ public final class ValidateManager {
         }
     };
 
-    private final Map<Class<?>, Validator> mCache = new HashMap<>();
+    private final Map<Integer, Validator> mCache = new HashMap<>();
     //anno-plugin
     private final Map<Class, ValidatePlugin> mPlugins = new HashMap<>();
     private final Object mContext;
@@ -168,13 +168,15 @@ public final class ValidateManager {
 
     private void getValidateItems(Object owner, Class cur, List<Item> out, boolean breakIfFound){
         Annotation[] arr = new Annotation[1];
+        Annotation anno;
         out:
         while (true){
             ValidatePlugin plugin = resolveAnnotation(cur, arr);
+            anno = arr[0];
             if(plugin != null){
-                Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
-                if(!validator.accept(mContext, owner, arr[0])){
-                    out.add(new Item(plugin.getMessage(arr[0]), validator, owner, plugin.getOrder(arr[0])));
+                Validator validator = getValidator(plugin, anno);
+                if(!validator.accept(mContext, owner, anno)){
+                    out.add(new Item(plugin.getMessage(anno), validator, owner, plugin.getOrder(anno)));
                 }
                 if(breakIfFound){
                     break;
@@ -185,12 +187,13 @@ public final class ValidateManager {
                     for (Field f : fields){
                         f.setAccessible(true);
                         plugin = resolveAnnotation(f, arr);
+                        anno = arr[0];
                         if(plugin != null){
-                            Validator validator = getValidator(plugin.getValidatorClass(arr[0]));
+                            Validator validator = getValidator(plugin, anno);
                             try {
                                 Object o = mReader.read(mContext, owner, f);
-                                if(!validator.accept(mContext, o, arr[0])){
-                                    out.add(new Item(plugin.getMessage(arr[0]), validator, o, plugin.getOrder(arr[0])));
+                                if(!validator.accept(mContext, o, anno)){
+                                    out.add(new Item(plugin.getMessage(anno), validator, o, plugin.getOrder(anno)));
                                     if(breakIfFound){
                                         break out;
                                     }
@@ -208,21 +211,18 @@ public final class ValidateManager {
             }
         }
     }
-    private Validator getValidator(Class<?> type){
-        Validator validator = mCache.get(type);
-        if(validator != null){
-            return validator;
+    private Validator getValidator(ValidatePlugin plugin, Annotation anno){
+        Integer key = plugin.getCacheKey(anno);
+        Validator validator = null;
+        if(key != null){
+            validator = mCache.get(key);
         }
-        if(type == Validator.class){
-            validator = new StringValidator();
-        }else {
-            try {
-                validator = (Validator) type.newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        if(validator == null){
+            validator = plugin.getValidator(anno);
         }
-        mCache.put(type, validator);
+        if(key != null){
+            mCache.put(key, validator);
+        }
         return validator;
     }
 

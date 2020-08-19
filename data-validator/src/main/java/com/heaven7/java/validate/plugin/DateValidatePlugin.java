@@ -1,11 +1,15 @@
 package com.heaven7.java.validate.plugin;
 
 import com.heaven7.java.validate.ValidatePlugin;
+import com.heaven7.java.validate.Validator;
 import com.heaven7.java.validate.anno.ValidateDate;
 import com.heaven7.java.validate.validator.DateValidator;
 
 import java.lang.annotation.Annotation;
 
+/**
+ * Date validate plugin
+ */
 public class DateValidatePlugin implements ValidatePlugin {
 
     @Override
@@ -13,9 +17,16 @@ public class DateValidatePlugin implements ValidatePlugin {
         ValidateDate vd = (ValidateDate) anno;
         return vd.value();
     }
+
     @Override
-    public Class<?> getValidatorClass(Annotation anno) {
-        return DateValidator.class;
+    public Validator getValidator(Annotation anno) {
+        return new DateValidator();
+    }
+
+    @Override
+    public Integer getCacheKey(Annotation anno) {
+        ValidateDate vd = (ValidateDate) anno;
+        return (DateValidator.class.getName() + vd.rangeValidator().getName()).hashCode();
     }
 
     @Override

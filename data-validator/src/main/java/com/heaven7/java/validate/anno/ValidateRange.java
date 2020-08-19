@@ -5,10 +5,14 @@ import com.heaven7.java.validate.validator.SimpleRangeValidator;
 
 import java.lang.annotation.*;
 
+/**
+ * validate range
+ * @since 1.0.2
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
-public @interface ValidateDate {
+public @interface ValidateRange {
 
     /**
      * the notice message if validate failed
@@ -20,13 +24,13 @@ public @interface ValidateDate {
      * the range expression . like '199 <= x <= 2000 '
      * @return the range expression
      */
-    String rangeExpre() default "";
+    String expression() default "";
 
     /**
      * the range validator class
      * @return  the range validator class
      */
-    Class<? extends RangeValidator> rangeValidator() default SimpleRangeValidator.class;
+    Class<? extends RangeValidator> validator() default SimpleRangeValidator.class;
 
     /**
      * indicate null is permit or not

@@ -17,20 +17,17 @@ public class DateValidator implements Validator {
 
     @Override
     public boolean accept(Object context, Object input, Annotation annotation) {
+        ValidateDate vd = (ValidateDate) annotation;
+        if(input == null){
+            return vd.nullable();
+        }
         try {
-            if (annotation instanceof ValidateDate ) {
-                ValidateDate vd = (ValidateDate) annotation;
-                if(vd.rangeValidator() != RangeValidator.class && !TextUtils.isEmpty(vd.rangeExpre())){
-                    Object val = input;
-                    if(input instanceof String && context instanceof DateContext){
-                        val = new SimpleDateFormat(((DateContext) context).getDateTemplate()).parse((String) input).getTime();
-                    }
-                    return vd.rangeValidator().newInstance().accept(context, vd.rangeExpre(), val, parser, Comparators.NUMBER);
+            if(vd.rangeValidator() != RangeValidator.class && !TextUtils.isEmpty(vd.rangeExpre())){
+                Object val = input;
+                if(input instanceof String && context instanceof DateContext){
+                    val = new SimpleDateFormat(((DateContext) context).getDateTemplate()).parse((String) input).getTime();
                 }
-            }
-            if(input instanceof String && context instanceof DateContext){
-                new SimpleDateFormat(((DateContext) context).getDateTemplate()).parse((String) input);
-                return true;
+                return vd.rangeValidator().newInstance().accept(context, vd.rangeExpre(), val, parser, Comparators.NUMBER);
             }
         }catch (Exception e) {
             return false;
