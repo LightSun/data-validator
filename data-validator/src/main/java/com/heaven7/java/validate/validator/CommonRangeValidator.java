@@ -7,6 +7,10 @@ import com.heaven7.java.validate.anno.ValidateRange;
 import java.lang.annotation.Annotation;
 import java.util.Comparator;
 
+/**
+ * the common range validator
+ * @since 1.0.2
+ */
 public class CommonRangeValidator implements Validator {
 
     private final RangeValidator.Parser expreParser;

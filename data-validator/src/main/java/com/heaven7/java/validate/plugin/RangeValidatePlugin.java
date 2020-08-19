@@ -9,6 +9,10 @@ import com.heaven7.java.validate.validator.CommonRangeValidator;
 import java.lang.annotation.Annotation;
 import java.util.Comparator;
 
+/**
+ * range validate plugin
+ * @since 1.0.2
+ */
 public class RangeValidatePlugin implements ValidatePlugin {
 
     private final RangeValidator.Parser expreParser;
