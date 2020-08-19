@@ -20,13 +20,13 @@ public @interface ValidateDate {
      * the range expression . like '199 <= x <= 2000 '
      * @return the range expression
      */
-    String rangeExpre() default "";
+    String expression() default "";
 
     /**
      * the range validator class
      * @return  the range validator class
      */
-    Class<? extends RangeValidator> rangeValidator() default SimpleRangeValidator.class;
+    Class<? extends RangeValidator> validator() default SimpleRangeValidator.class;
 
     /**
      * indicate null is permit or not

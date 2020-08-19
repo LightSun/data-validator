@@ -26,7 +26,7 @@ public class DateValidatePlugin implements ValidatePlugin {
     @Override
     public Integer getCacheKey(Annotation anno) {
         ValidateDate vd = (ValidateDate) anno;
-        return (DateValidator.class.getName() + vd.rangeValidator().getName()).hashCode();
+        return (DateValidator.class.getName() + vd.validator().getName()).hashCode();
     }
 
     @Override

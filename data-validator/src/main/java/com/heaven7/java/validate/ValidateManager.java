@@ -2,7 +2,6 @@ package com.heaven7.java.validate;
 
 import com.heaven7.java.validate.anno.Validate;
 import com.heaven7.java.validate.anno.ValidateDate;
-import com.heaven7.java.validate.validator.StringValidator;
 import com.heaven7.java.validate.plugin.CommonValidatePlugin;
 import com.heaven7.java.validate.plugin.DateValidatePlugin;
 import com.heaven7.java.visitor.MapPredicateVisitor;

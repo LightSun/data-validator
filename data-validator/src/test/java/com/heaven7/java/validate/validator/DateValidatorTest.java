@@ -45,9 +45,9 @@ public class DateValidatorTest {
     }
 
     public static class Data{
-        @ValidateDate(value = "dfgg", rangeExpre = "2000-01-02 <= x < 2000-01-04")
+        @ValidateDate(value = "dfgg", expression = "2000-01-02 <= x < 2000-01-04")
         private String d1;
-        @ValidateDate(value = "dfgg", rangeExpre = "2000-01-02 <= x < 2000-01-04")
+        @ValidateDate(value = "dfgg", expression = "2000-01-02 <= x < 2000-01-04")
         private long d2;
     }
 

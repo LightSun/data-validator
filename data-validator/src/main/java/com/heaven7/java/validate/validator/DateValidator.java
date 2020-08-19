@@ -22,12 +22,12 @@ public class DateValidator implements Validator {
             return vd.nullable();
         }
         try {
-            if(vd.rangeValidator() != RangeValidator.class && !TextUtils.isEmpty(vd.rangeExpre())){
+            if(vd.validator() != RangeValidator.class && !TextUtils.isEmpty(vd.expression())){
                 Object val = input;
                 if(input instanceof String && context instanceof DateContext){
                     val = new SimpleDateFormat(((DateContext) context).getDateTemplate()).parse((String) input).getTime();
                 }
-                return vd.rangeValidator().newInstance().accept(context, vd.rangeExpre(), val, parser, Comparators.NUMBER);
+                return vd.validator().newInstance().accept(context, vd.expression(), val, parser, Comparators.NUMBER);
             }
         }catch (Exception e) {
             return false;

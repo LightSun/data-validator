@@ -1,5 +1,6 @@
 package com.heaven7.java.validate.validator;
 
+import com.heaven7.java.base.util.TextUtils;
 import com.heaven7.java.validate.RangeValidator;
 import com.heaven7.java.validate.Validator;
 import com.heaven7.java.validate.anno.ValidateRange;
@@ -26,6 +27,10 @@ public class CommonRangeValidator implements Validator {
         ValidateRange vr = (ValidateRange) annotation;
         if(input == null){
             return vr.nullable();
+        }
+        //no expression .permit
+        if(TextUtils.isEmpty(vr.expression())){
+            return true;
         }
         try {
             RangeValidator validator = vr.validator().newInstance();

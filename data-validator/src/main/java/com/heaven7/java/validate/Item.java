@@ -25,4 +25,14 @@ public final class Item {
         this.value = val;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "msg='" + msg + '\'' +
+                ", validator=" + validator +
+                ", value=" + value +
+                ", order=" + order +
+                '}';
+    }
 }
