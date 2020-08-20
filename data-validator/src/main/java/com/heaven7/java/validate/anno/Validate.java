@@ -27,9 +27,4 @@ public @interface Validate{
      * @since 1.0.2
      */
     boolean nullable() default false;
-    /**
-     * the order of member. min means validate first.
-     * @return the order
-     */
-    int order() default 1;
 }

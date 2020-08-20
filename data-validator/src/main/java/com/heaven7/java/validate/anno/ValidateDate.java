@@ -34,9 +34,4 @@ public @interface ValidateDate {
      * @since 1.0.2
      */
     boolean nullable() default false;
-    /**
-     * the order of member. min means validate first, that means 'AESC'.
-     * @return the order
-     */
-    int order() default 1;
 }

@@ -1,6 +1,7 @@
 package com.heaven7.java.validate;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 
 /**
  * the validate plugin.
@@ -29,9 +30,11 @@ public interface ValidatePlugin {
 
     /**
      * get the order of validate
+     *
+     * @param element the element.often is the class or field object
      * @param anno the annotation
      * @return the order
      */
-    int getOrder(Annotation anno);
+    int getOrder(AnnotatedElement element, Annotation anno);
 
 }

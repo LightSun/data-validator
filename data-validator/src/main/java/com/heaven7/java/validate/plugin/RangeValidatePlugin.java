@@ -1,7 +1,6 @@
 package com.heaven7.java.validate.plugin;
 
 import com.heaven7.java.validate.RangeValidator;
-import com.heaven7.java.validate.ValidatePlugin;
 import com.heaven7.java.validate.Validator;
 import com.heaven7.java.validate.anno.ValidateRange;
 import com.heaven7.java.validate.validator.CommonRangeValidator;
@@ -13,7 +12,7 @@ import java.util.Comparator;
  * range validate plugin
  * @since 1.0.2
  */
-public class RangeValidatePlugin implements ValidatePlugin {
+public class RangeValidatePlugin extends AbstractValidatePlugin {
 
     private final RangeValidator.Parser expreParser;
     private final Comparator comparator;
@@ -37,11 +36,5 @@ public class RangeValidatePlugin implements ValidatePlugin {
     @Override
     public Integer getCacheKey(Annotation anno) {
         return ("RangeValidatePlugin: " + expreParser.getClass().getName() + comparator.getClass().getName()).hashCode();
-    }
-
-    @Override
-    public int getOrder(Annotation anno) {
-        ValidateRange vd = (ValidateRange) anno;
-        return vd.order();
     }
 }
