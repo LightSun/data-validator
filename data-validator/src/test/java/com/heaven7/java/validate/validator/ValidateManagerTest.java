@@ -3,6 +3,7 @@ package com.heaven7.java.validate.validator;
 import com.heaven7.java.validate.DateContext;
 import com.heaven7.java.validate.Item;
 import com.heaven7.java.validate.ValidateManager;
+import com.heaven7.java.validate.anno.Sort;
 import com.heaven7.java.validate.anno.ValidateDate;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,9 +30,11 @@ public class ValidateManagerTest {
     }
 
     public static class Data{
-        @ValidateDate(value = "string date", expression = "2000-01-02 <= x < 2000-01-04", order = 1)
+        @Sort(2)
+        @ValidateDate(value = "string date", expression = "2000-01-02 <= x < 2000-01-04")
         private String d1;
-        @ValidateDate(value = "long date", expression = "2000-01-02 <= x < 2000-01-04",order = 2)
+        @Sort(1)
+        @ValidateDate(value = "long date", expression = "2000-01-02 <= x < 2000-01-04")
         private long d2;
 
         public Data(String d1, long d2) {

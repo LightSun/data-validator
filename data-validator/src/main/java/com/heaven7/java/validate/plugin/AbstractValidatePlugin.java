@@ -10,7 +10,7 @@ public abstract class AbstractValidatePlugin implements ValidatePlugin {
     @Override
     public int getOrder(AnnotatedElement element, Annotation anno) {
         Sort sort = element.getAnnotation(Sort.class);
-        return sort != null ? sort.order() : 0;
+        return sort != null ? sort.value() : 0;
     }
 
 }

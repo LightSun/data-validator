@@ -11,5 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Sort {
-    int order() default 0;
+    int value() default 0;
 }
